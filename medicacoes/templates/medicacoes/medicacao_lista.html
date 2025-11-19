@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Medicações | Histórico de Saúde</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f7f9;
+            color: #333;
+        }
+
+        h1 {
+            color: #0056b3;
+            border-bottom: 2px solid #ccc;
+            padding-bottom: 10px;
+        }
+
+        .medication-table {
+            width: 100%;
+            border-collapse: collapse; /* Remove espaçamento entre bordas */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            background-color: #fff;
+            margin-top: 20px;
+        }
+
+        .medication-table th,
+        .medication-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .medication-table th {
+            background-color: #e9ecef;
+            color: #495057;
+            text-transform: uppercase;
+            font-size: 0.9em;
+        }
+
+        .medication-table tr:nth-child(even) {
+            background-color: #f8f9fa; /* Zebra striping */
+        }
+
+        .medication-table tr:hover {
+            background-color: #e2f4ff;
+        }
+
+        .empty-message {
+            padding: 15px;
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+            border-radius: 5px;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Lista de Medicações Atuais</h1>
+
+    {% if medicacoes %}
+        <table class="medication-table">
+            <thead>
+                <tr>
+                    <th scope="col">Nome</th>
+                    <th scope="col">Dosagem</th>
+                    <th scope="col">Frequência</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for med in medicacoes %}
+                    <tr>
+                        <td data-label="Nome">{{ med.nome }}</td>
+                        <td data-label="Dosagem">{{ med.dosagem }}</td>
+                        <td data-label="Frequência">{{ med.frequencia }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="empty-message">
+            <p><strong>Nenhuma medicação cadastrada.</strong> Por favor, adicione um item à sua lista.</p>
+        </div>
+    {% endif %}
+</body>
+</html>
