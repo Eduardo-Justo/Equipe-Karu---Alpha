@@ -2,19 +2,25 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    # Dashboard local (opcional)
+    # === PAINEL PRINCIPAL ===
     path('', views.dashboard, name='dashboard'),
 
-    # Medicações
-    path('listar/', views.listar_medicacoes, name='listar_medicacoes'),
-    path('novo/', views.form_medicacao, name='nova_medicacao'),
+    # === MEDICAÇÕES ===
+    # Listar todas
+    path('medicacoes/', views.listar_medicacoes, name='listar_medicacoes'),
+    # Criar nova (nome ajustado para bater com o template)
+    path('medicacoes/nova/', views.criar_medicacao, name='criar_medicacao'),
+    # Editar (adicionado o <int:id> para receber o ID do item)
+    path('medicacoes/editar/<int:id>/', views.editar_medicacao, name='editar_medicacao'),
 
-    # Lembretes
+    # === LEMBRETES ===
     path('lembretes/', views.listar_lembretes, name='listar_lembretes'),
+    # Adicionei a rota de editar pois o template de lembretes tem um botão de editar
+    path('lembretes/editar/<int:id>/', views.editar_lembrete, name='editar_lembrete'),
 
-    # Estoque
+    # === ESTOQUE ===
     path('estoque/', views.listar_estoque, name='listar_estoque'),
 
-    # Registros
+    # === REGISTROS ===
     path('registros/', views.listar_registros, name='listar_registros'),
 ]

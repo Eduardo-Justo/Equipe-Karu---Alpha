@@ -1,38 +1,82 @@
 {% extends "base.html" %}
-{% block title %}Painel{% endblock %}
+
+{% block title %}Painel - Karu{% endblock %}
+
+{# Define o título que aparece no topo da página (Header do base.html) #}
+{% block header_title %}Visão Geral{% endblock %}
 
 {% block content %}
-<h2 class="text-2xl font-bold mb-6">Gerenciar Medicações</h2>
+    <!-- Seção de Boas-vindas -->
+    <div class="mb-8">
+        <h1 class="text-2xl font-bold text-slate-800 mb-2">Bem-vindo ao Sistema Karu!</h1>
+        <p class="text-slate-500">Selecione uma das opções abaixo para gerenciar as atividades.</p>
+    </div>
 
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <!-- Grid de Navegação (Cards) -->
+    <!-- Responsivo: 1 coluna no mobile, 2 no tablet, 4 no desktop -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
+        
+        <!-- Card: Medicações -->
+        <a href="{% url 'listar_medicacoes' %}" class="group bg-white p-6 rounded-xl shadow-sm border border-slate-100 hover:shadow-md hover:border-blue-200 transition-all duration-200 flex flex-col">
+            <div class="flex items-center justify-between mb-4">
+                <!-- Ícone com fundo colorido -->
+                <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-pills"></i>
+                </div>
+                <!-- Tag pequena -->
+                <span class="text-xs font-semibold bg-slate-100 text-slate-500 px-2 py-1 rounded">Gerenciar</span>
+            </div>
+            <h3 class="text-lg font-bold text-slate-800 mb-1">Medicações</h3>
+            <p class="text-slate-500 text-sm mt-auto">Cadastre e edite medicamentos e dosagens.</p>
+        </a>
 
-    <a href="{% url 'listar_medicacoes' %}">
-        <div class="card p-6 border border-blue-200">
-            <h3 class="text-lg font-semibold text-blue-800">Gerenciar Medicações</h3>
-            <p class="text-gray-600 mt-2">Veja, edite ou cadastre novas medicações.</p>
+        <!-- Card: Lembretes -->
+        <a href="{% url 'listar_lembretes' %}" class="group bg-white p-6 rounded-xl shadow-sm border border-slate-100 hover:shadow-md hover:border-orange-200 transition-all duration-200 flex flex-col">
+            <div class="flex items-center justify-between mb-4">
+                <div class="w-12 h-12 bg-orange-50 text-orange-600 rounded-lg flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-clock"></i>
+                </div>
+                <span class="text-xs font-semibold bg-slate-100 text-slate-500 px-2 py-1 rounded">Alertas</span>
+            </div>
+            <h3 class="text-lg font-bold text-slate-800 mb-1">Lembretes</h3>
+            <p class="text-slate-500 text-sm mt-auto">Configure horários e alarmes automáticos.</p>
+        </a>
+
+        <!-- Card: Estoque -->
+        <a href="{% url 'listar_estoque' %}" class="group bg-white p-6 rounded-xl shadow-sm border border-slate-100 hover:shadow-md hover:border-emerald-200 transition-all duration-200 flex flex-col">
+            <div class="flex items-center justify-between mb-4">
+                <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-lg flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-boxes-stacked"></i>
+                </div>
+                <span class="text-xs font-semibold bg-slate-100 text-slate-500 px-2 py-1 rounded">Controle</span>
+            </div>
+            <h3 class="text-lg font-bold text-slate-800 mb-1">Estoque</h3>
+            <p class="text-slate-500 text-sm mt-auto">Visualize e controle a quantidade disponível.</p>
+        </a>
+
+        <!-- Card: Registros -->
+        <a href="{% url 'listar_registros' %}" class="group bg-white p-6 rounded-xl shadow-sm border border-slate-100 hover:shadow-md hover:border-purple-200 transition-all duration-200 flex flex-col">
+            <div class="flex items-center justify-between mb-4">
+                <div class="w-12 h-12 bg-purple-50 text-purple-600 rounded-lg flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-clipboard-user"></i>
+                </div>
+                <span class="text-xs font-semibold bg-slate-100 text-slate-500 px-2 py-1 rounded">Histórico</span>
+            </div>
+            <h3 class="text-lg font-bold text-slate-800 mb-1">Registros</h3>
+            <p class="text-slate-500 text-sm mt-auto">Histórico completo de doses administradas.</p>
+        </a>
+
+    </div>
+
+    <!-- Área Extra (Opcional: Para futuras estatísticas) -->
+    <div class="bg-white border border-slate-100 rounded-xl shadow-sm p-6">
+        <h3 class="font-semibold text-slate-800 mb-4 flex items-center gap-2">
+            <i class="fa-solid fa-rocket text-slate-400"></i> Acesso Rápido
+        </h3>
+        <div class="flex gap-4">
+            <button class="px-4 py-2 text-sm font-medium text-brand-600 bg-brand-50 rounded-lg hover:bg-brand-100 transition-colors">
+                + Adicionar Medicação (Em breve)
+            </button>
         </div>
-    </a>
-
-    <a href="{% url 'listar_lembretes' %}">
-        <div class="card p-6 border border-blue-200">
-            <h3 class="text-lg font-semibold text-blue-800">Gerenciar Lembretes</h3>
-            <p class="text-gray-600 mt-2">Configure horários e alertas automáticos.</p>
-        </div>
-    </a>
-
-    <a href="{% url 'listar_estoque' %}">
-        <div class="card p-6 border border-blue-200">
-            <h3 class="text-lg font-semibold text-blue-800">Estoque</h3>
-            <p class="text-gray-600 mt-2">Acompanhe o estoque e alertas de baixo nível.</p>
-        </div>
-    </a>
-
-    <a href="{% url 'listar_registros' %}">
-        <div class="card p-6 border border-blue-200">
-            <h3 class="text-lg font-semibold text-blue-800">Registro de Administração</h3>
-            <p class="text-gray-600 mt-2">Veja quando e como as doses foram dadas.</p>
-        </div>
-    </a>
-
-</div>
+    </div>
 {% endblock %}

@@ -1,40 +1,155 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Sistema{% endblock %}</title>
+    <title>{% block title %}Karu - Sistema de Saúde{% endblock %}</title>
 
+    <!-- Tailwind CSS via CDN (Para desenvolvimento) -->
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <style>
-        body {
-            background-color: #f5f6fa;
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Configurações Customizadas do Tailwind -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        // Paleta Azul Médica
+                        brand: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            600: '#2563eb', // Azul vibrante para botões
+                            800: '#1e40af', // Azul escuro para textos
+                            900: '#1e3a8a', // Seu azul original do header
+                        }
+                    }
+                }
+            }
         }
-        header {
-            background-color: #1e3a8a; 
-        }
-        .card {
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-            transition: 0.2s;
-        }
-        .card:hover {
-            transform: translateY(-3px);
-        }
-    </style>
+    </script>
 </head>
 
-<body>
+<body class="bg-slate-50 font-sans text-slate-800 antialiased">
 
-<header class="text-white p-4 shadow">
-    <h1 class="text-xl font-semibold">Painel Administrativo</h1>
-</header>
+    <div class="min-h-screen flex flex-col md:flex-row">
+        
+        <!-- SIDEBAR (Menu Lateral) -->
+        <!-- Escondido no mobile (hidden), visível no desktop (md:flex) -->
+        <aside class="w-full md:w-64 bg-white border-r border-slate-200 flex-shrink-0 hidden md:flex flex-col">
+            <!-- Logo Area -->
+            <div class="h-16 flex items-center px-6 border-b border-slate-100">
+                <a href="/" class="flex items-center gap-2 text-brand-900 font-bold text-xl">
+                    <i class="fa-solid fa-heart-pulse text-brand-600"></i>
+                    <span>Karu</span>
+                </a>
+            </div>
 
-<main class="max-w-6xl mx-auto mt-8 p-4">
-    {% block content %}{% endblock %}
-</main>
+            <!-- Navigation Links -->
+            <nav class="flex-1 overflow-y-auto py-4">
+                <ul class="space-y-1 px-3">
+                    <!-- Dashboard -->
+                    <li>
+                        <a href="/" class="flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-brand-50 hover:text-brand-900 rounded-lg font-medium transition-colors">
+                            <i class="fa-solid fa-chart-pie w-5 text-center"></i>
+                            <span>Painel</span>
+                        </a>
+                    </li>
+                    
+                    <!-- Medicações -->
+                    <li>
+                        <a href="{% url 'listar_medicacoes' %}" class="flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-brand-50 hover:text-brand-900 rounded-lg font-medium transition-colors">
+                            <i class="fa-solid fa-pills w-5 text-center"></i>
+                            <span>Medicações</span>
+                        </a>
+                    </li>
+
+                    <!-- Lembretes -->
+                    <li>
+                        <a href="{% url 'listar_lembretes' %}" class="flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-brand-50 hover:text-brand-900 rounded-lg font-medium transition-colors">
+                            <i class="fa-solid fa-clock w-5 text-center"></i>
+                            <span>Lembretes</span>
+                        </a>
+                    </li>
+
+                    <!-- Estoque -->
+                    <li>
+                        <a href="{% url 'listar_estoque' %}" class="flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-brand-50 hover:text-brand-900 rounded-lg font-medium transition-colors">
+                            <i class="fa-solid fa-boxes-stacked w-5 text-center"></i>
+                            <span>Estoque</span>
+                        </a>
+                    </li>
+
+                    <!-- Registros -->
+                    <li>
+                        <a href="{% url 'listar_registros' %}" class="flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-brand-50 hover:text-brand-900 rounded-lg font-medium transition-colors">
+                            <i class="fa-solid fa-clipboard-list w-5 text-center"></i>
+                            <span>Registros</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- HEADER MOBILE -->
+        <div class="md:hidden bg-brand-900 text-white p-4 flex justify-between items-center shadow-md">
+            <span class="font-bold text-lg flex items-center gap-2">
+                <i class="fa-solid fa-heart-pulse"></i> Karu
+            </span>
+            <!-- Aqui você poderia adicionar um JavaScript simples para toggle do menu -->
+            <button class="text-white focus:outline-none">
+                <i class="fa-solid fa-bars text-xl"></i>
+            </button>
+        </div>
+
+        <!-- CONTEÚDO PRINCIPAL -->
+        <div class="flex-1 flex flex-col h-screen overflow-hidden">
+            
+            <!-- Top Header (Desktop) -->
+            <header class="hidden md:flex bg-white h-16 border-b border-slate-200 items-center justify-between px-8 flex-shrink-0">
+                <h2 class="text-lg font-semibold text-slate-700">
+                    <!-- Título Dinâmico da Página -->
+                    {% block header_title %}Visão Geral{% endblock %}
+                </h2>
+                
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 bg-brand-100 text-brand-700 rounded-full flex items-center justify-center font-bold text-sm">
+                            U
+                        </div>
+                        <span class="text-sm font-medium text-slate-600">Administrador</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Area de Scroll do Conteúdo -->
+            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-slate-50 p-6 md:p-8">
+                <!-- Mensagens do Django (Sucesso/Erro) -->
+                {% if messages %}
+                    <div class="mb-6 space-y-2">
+                        {% for message in messages %}
+                            <div class="p-4 rounded-lg border {% if message.tags == 'success' %}bg-green-50 border-green-200 text-green-700{% elif message.tags == 'error' %}bg-red-50 border-red-200 text-red-700{% else %}bg-blue-50 border-blue-200 text-blue-700{% endif %}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <!-- Bloco Principal -->
+                {% block content %}
+                {% endblock %}
+            </main>
+        </div>
+    </div>
 
 </body>
 </html>
