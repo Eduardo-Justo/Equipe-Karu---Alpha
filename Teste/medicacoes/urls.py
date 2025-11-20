@@ -2,11 +2,12 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+    # Dashboard local (opcional)
     path('', views.dashboard, name='dashboard'),
 
     # Medicações
-    path('medicacoes/', views.listar_medicacoes, name='listar_medicacoes'),
-    path('medicacoes/novo/', views.form_medicacao, name='nova_medicacao'),
+    path('listar/', views.listar_medicacoes, name='listar_medicacoes'),
+    path('novo/', views.form_medicacao, name='nova_medicacao'),
 
     # Lembretes
     path('lembretes/', views.listar_lembretes, name='listar_lembretes'),

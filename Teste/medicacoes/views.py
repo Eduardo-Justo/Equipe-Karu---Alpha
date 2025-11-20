@@ -1,6 +1,5 @@
 from django.shortcuts import render
 
-
 # === PAINEL PRINCIPAL ===
 def dashboard(request):
     return render(request, "dashboard.html")
