@@ -1,71 +1,174 @@
 from django.shortcuts import render, redirect, get_object_or_404
-# Importe seus models aqui quando tiver eles criados, ex:
-# from .models import Medicacao, Lembrete, Estoque, Registro
-# from .forms import MedicacaoForm
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from .models import Medicacao, Lembrete, Estoque, RegistroAdministracao
+from .forms import MedicacaoForm, LembreteForm, EstoqueForm, RegistroForm
 
 # === PAINEL PRINCIPAL ===
+@login_required
 def dashboard(request):
-    # Aqui você futuramente fará queries para preencher os cards de resumo
-    return render(request, "dashboard.html")
-
+    context = {
+        'total_medicacoes': Medicacao.objects.count(),
+        'total_lembretes': Lembrete.objects.count(),
+        'baixo_estoque': Estoque.objects.filter(alerta_baixo_estoque=True).count(),
+    }
+    return render(request, "dashboard.html", context)
 
 # === MEDICAÇÕES ===
+@login_required
 def listar_medicacoes(request):
-    # Busque do banco: medicacoes = Medicacao.objects.all()
-    medicacoes = [] # Lista vazia por enquanto para não dar erro
-    
-    context = {
-        'medicacoes': medicacoes
-    }
-    return render(request, "medicacoes/listar.html", context)
+    medicacoes = Medicacao.objects.all().order_by('-data_inicio')
+    return render(request, "medicacoes/listar.html", {'medicacoes': medicacoes})
 
+@login_required
 def criar_medicacao(request):
-    # Lógica do Form aqui (POST vs GET)
     if request.method == 'POST':
-        # form = MedicacaoForm(request.POST)
-        # if form.is_valid(): form.save(); return redirect('listar_medicacoes')
-        pass
-    
-    # form = MedicacaoForm()
-    context = {
-        'titulo': 'Nova Medicação',
-        'form': [] # Passe o form real aqui
-    }
-    return render(request, "medicacoes/form.html", context)
+        form = MedicacaoForm(request.POST)
+        if form.is_valid():
+            medicacao = form.save() # Salva a medicação
+            
+            # --- LOG AUTOMÁTICO ---
+            RegistroAdministracao.objects.create(
+                medicacao=medicacao,
+                status='SISTEMA_ADD',
+                observacoes=f"Nova medicação cadastrada por {request.user.username}"
+            )
+            # ----------------------
 
+            messages.success(request, 'Medicação criada com sucesso!')
+            return redirect('listar_medicacoes')
+    else:
+        form = MedicacaoForm()
+    return render(request, "medicacoes/form.html", {'form': form, 'titulo': 'Nova Medicação'})
+
+@login_required
 def editar_medicacao(request, id):
-    # med = get_object_or_404(Medicacao, id=id)
-    # Lógica de update...
-    
-    context = {
-        'titulo': f'Editar Medicação #{id}', # Exibe o ID no título
-        'form': [] 
-    }
-    return render(request, "medicacoes/form.html", context)
+    medicacao = get_object_or_404(Medicacao, id=id)
+    if request.method == 'POST':
+        form = MedicacaoForm(request.POST, instance=medicacao)
+        if form.is_valid():
+            form.save()
 
+            # --- LOG AUTOMÁTICO ---
+            RegistroAdministracao.objects.create(
+                medicacao=medicacao,
+                status='SISTEMA_EDIT',
+                observacoes=f"Dados alterados por {request.user.username}"
+            )
+            # ----------------------
+
+            messages.success(request, 'Medicação atualizada!')
+            return redirect('listar_medicacoes')
+    else:
+        form = MedicacaoForm(instance=medicacao)
+    return render(request, "medicacoes/form.html", {'form': form, 'titulo': f'Editar {medicacao.nome}'})
 
 # === LEMBRETES ===
+@login_required
 def listar_lembretes(request):
-    # lembretes = Lembrete.objects.all()
-    lembretes = []
+    lembretes = Lembrete.objects.all().order_by('horario')
     return render(request, "lembretes/listar.html", {'lembretes': lembretes})
 
-def editar_lembrete(request, id):
-    # Lógica de edição de lembrete
-    # return render(request, "lembretes/form.html", ...)
-    # Por enquanto redireciona para lista ou renderiza um form placeholder
-    return render(request, "lembretes/listar.html", {})
+@login_required
+def criar_lembrete(request):
+    if request.method == 'POST':
+        form = LembreteForm(request.POST)
+        if form.is_valid():
+            lembrete = form.save()
 
+            # --- LOG AUTOMÁTICO ---
+            RegistroAdministracao.objects.create(
+                medicacao=lembrete.medicacao,
+                status='SISTEMA_ADD',
+                observacoes=f"Novo lembrete definido para {lembrete.horario}"
+            )
+            # ----------------------
+
+            messages.success(request, 'Lembrete criado!')
+            return redirect('listar_lembretes')
+    else:
+        form = LembreteForm()
+    return render(request, "medicacoes/form.html", {'form': form, 'titulo': 'Novo Lembrete'})
+
+@login_required
+def editar_lembrete(request, id):
+    lembrete = get_object_or_404(Lembrete, id=id)
+    if request.method == 'POST':
+        form = LembreteForm(request.POST, instance=lembrete)
+        if form.is_valid():
+            form.save()
+
+            # --- LOG AUTOMÁTICO ---
+            RegistroAdministracao.objects.create(
+                medicacao=lembrete.medicacao,
+                status='SISTEMA_EDIT',
+                observacoes=f"Horário do lembrete alterado para {lembrete.horario}"
+            )
+            # ----------------------
+
+            messages.success(request, 'Lembrete atualizado!')
+            return redirect('listar_lembretes')
+    else:
+        form = LembreteForm(instance=lembrete)
+    return render(request, "medicacoes/form.html", {'form': form, 'titulo': 'Editar Lembrete'})
 
 # === ESTOQUE ===
+@login_required
 def listar_estoque(request):
-    # estoques = Estoque.objects.all()
-    estoques = []
+    estoques = Estoque.objects.all()
+    for item in estoques:
+        item.atualizar_alerta()
     return render(request, "estoques/listar.html", {'estoques': estoques})
 
+@login_required
+def criar_estoque(request):
+    if request.method == 'POST':
+        form = EstoqueForm(request.POST)
+        if form.is_valid():
+            estoque = form.save(commit=False)
+            estoque.atualizar_alerta()
+            estoque.save()
+
+            # --- LOG AUTOMÁTICO ---
+            RegistroAdministracao.objects.create(
+                medicacao=estoque.medicacao,
+                status='ESTOQUE_UP',
+                observacoes=f"Estoque iniciado: {estoque.quantidade_total_ml}ml"
+            )
+            # ----------------------
+
+            messages.success(request, 'Item adicionado ao estoque!')
+            return redirect('listar_estoque')
+    else:
+        form = EstoqueForm()
+    return render(request, "medicacoes/form.html", {'form': form, 'titulo': 'Novo Item de Estoque'})
+
+@login_required
+def editar_estoque(request, id):
+    item = get_object_or_404(Estoque, id=id)
+    if request.method == 'POST':
+        form = EstoqueForm(request.POST, instance=item)
+        if form.is_valid():
+            estoque = form.save(commit=False)
+            estoque.atualizar_alerta()
+            estoque.save()
+
+            # --- LOG AUTOMÁTICO ---
+            RegistroAdministracao.objects.create(
+                medicacao=estoque.medicacao,
+                status='ESTOQUE_UP',
+                observacoes=f"Estoque atualizado para: {estoque.quantidade_total_ml}ml"
+            )
+            # ----------------------
+
+            messages.success(request, 'Estoque atualizado!')
+            return redirect('listar_estoque')
+    else:
+        form = EstoqueForm(instance=item)
+    return render(request, "medicacoes/form.html", {'form': form, 'titulo': f'Editar Estoque: {item.medicacao.nome}'})
 
 # === REGISTROS ===
+@login_required
 def listar_registros(request):
-    # registros = Registro.objects.all().order_by('-horario_registro')
-    registros = []
+    registros = RegistroAdministracao.objects.all().order_by('-horario_registro')
     return render(request, "registros/listar.html", {'registros': registros})

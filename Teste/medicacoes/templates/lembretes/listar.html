@@ -14,7 +14,8 @@
         <p class="text-slate-500 text-sm">Gerencie os horários e alertas das medicações.</p>
     </div>
 
-    <a href="#" class="inline-flex items-center gap-2 bg-brand-600 text-white px-5 py-2.5 rounded-lg font-medium hover:bg-brand-700 transition-colors shadow-sm shadow-brand-200">
+    <!-- CORREÇÃO AQUI: Link para criar lembrete -->
+    <a href="{% url 'criar_lembrete' %}" class="inline-flex items-center gap-2 bg-brand-600 text-white px-5 py-2.5 rounded-lg font-medium hover:bg-brand-700 transition-colors shadow-sm shadow-brand-200">
         <i class="fa-solid fa-plus"></i>
         <span>Novo Lembrete</span>
     </a>
@@ -60,15 +61,13 @@
                         </div>
                     </td>
 
-                    <!-- Coluna Configurações (Agrupando Canal e Tolerância para economizar espaço) -->
+                    <!-- Coluna Configurações -->
                     <td class="p-4">
                         <div class="flex flex-col gap-1 items-start">
-                            <!-- Badge do Canal -->
                             <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium bg-slate-100 text-slate-600 border border-slate-200">
                                 <i class="fa-solid fa-paper-plane text-[10px]"></i>
                                 {{ l.canal_preferido }}
                             </span>
-                            <!-- Tolerância -->
                             <span class="text-xs text-slate-400 flex items-center gap-1">
                                 <i class="fa-solid fa-hourglass-start"></i>
                                 +{{ l.tolerancia_minutos }} min de tolerância
@@ -96,7 +95,8 @@
                             <p class="text-slate-500 max-w-xs mx-auto mt-1 mb-4 text-sm">
                                 Configure alertas para não esquecer de administrar as medicações no horário correto.
                             </p>
-                            <a href="#" class="text-brand-600 font-medium hover:underline text-sm">
+                            <!-- CORREÇÃO AQUI TAMBÉM: Link vazio -->
+                            <a href="{% url 'criar_lembrete' %}" class="text-brand-600 font-medium hover:underline text-sm">
                                 Criar meu primeiro lembrete &rarr;
                             </a>
                         </div>
