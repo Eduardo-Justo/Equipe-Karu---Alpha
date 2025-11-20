@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Sistema{% endblock %}</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        body {
+            background-color: #f5f6fa;
+        }
+        header {
+            background-color: #1e3a8a; 
+        }
+        .card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            transition: 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-3px);
+        }
+    </style>
+</head>
+
+<body>
+
+<header class="text-white p-4 shadow">
+    <h1 class="text-xl font-semibold">Painel Administrativo</h1>
+</header>
+
+<main class="max-w-6xl mx-auto mt-8 p-4">
+    {% block content %}{% endblock %}
+</main>
+
+</body>
+</html>

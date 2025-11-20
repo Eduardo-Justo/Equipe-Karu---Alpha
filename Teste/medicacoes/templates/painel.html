@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}Painel Administrativo{% endblock %}
+
+{% block content %}
+<h2>Painel Administrativo</h2>
+
+<div class="card">
+    <h3>Gerenciar Medicações</h3>
+    <p>Veja, adicione ou edite as medicações cadastradas.</p>
+    <a class="btn" href="/medicacoes/">Acessar</a>
+</div>
+
+<div class="card">
+    <h3>Gerenciar Lembretes</h3>
+    <p>Configure lembretes de horários e administração.</p>
+    <a class="btn" href="/lembretes/">Acessar</a>
+</div>
+
+<div class="card">
+    <h3>Registro de Administrações</h3>
+    <p>Veja o histórico de administrações realizadas.</p>
+    <a class="btn" href="/registro/">Acessar</a>
+</div>
+
+<div class="card">
+    <h3>Estoque</h3>
+    <p>Acompanhe o controle de estoque de medicamentos.</p>
+    <a class="btn" href="/estoques/">Acessar</a>
+</div>
+{% endblock %}

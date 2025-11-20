@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Painel{% endblock %}
+
+{% block content %}
+<h2 class="text-2xl font-bold mb-6">Gerenciar Medicações</h2>
+
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+    <a href="{% url 'listar_medicacoes' %}">
+        <div class="card p-6 border border-blue-200">
+            <h3 class="text-lg font-semibold text-blue-800">Gerenciar Medicações</h3>
+            <p class="text-gray-600 mt-2">Veja, edite ou cadastre novas medicações.</p>
+        </div>
+    </a>
+
+    <a href="{% url 'listar_lembretes' %}">
+        <div class="card p-6 border border-blue-200">
+            <h3 class="text-lg font-semibold text-blue-800">Gerenciar Lembretes</h3>
+            <p class="text-gray-600 mt-2">Configure horários e alertas automáticos.</p>
+        </div>
+    </a>
+
+    <a href="{% url 'listar_estoque' %}">
+        <div class="card p-6 border border-blue-200">
+            <h3 class="text-lg font-semibold text-blue-800">Estoque</h3>
+            <p class="text-gray-600 mt-2">Acompanhe o estoque e alertas de baixo nível.</p>
+        </div>
+    </a>
+
+    <a href="{% url 'listar_registros' %}">
+        <div class="card p-6 border border-blue-200">
+            <h3 class="text-lg font-semibold text-blue-800">Registro de Administração</h3>
+            <p class="text-gray-600 mt-2">Veja quando e como as doses foram dadas.</p>
+        </div>
+    </a>
+
+</div>
+{% endblock %}

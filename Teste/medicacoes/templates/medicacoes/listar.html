@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Medicações{% endblock %}
+
+{% block content %}
+
+<h2 class="text-2xl font-semibold text-blue-800 mb-4">
+    Lista de Medicações Atuais
+</h2>
+
+<div class="card p-4">
+    <table class="w-full border-collapse">
+        <thead>
+            <tr class="bg-blue-100 text-left text-blue-900">
+                <th class="p-3">Nome</th>
+                <th class="p-3">Dosagem</th>
+                <th class="p-3">Frequência</th>
+                <th class="p-3">Via</th>
+                <th class="p-3">Ações</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for m in medicacoes %}
+            <tr class="border-b">
+                <td class="p-3">{{ m.nome }}</td>
+                <td class="p-3">{{ m.dosagem }}</td>
+                <td class="p-3">{{ m.frequencia }}</td>
+                <td class="p-3">{{ m.via }}</td>
+                <td class="p-3">
+                    <a href="{% url 'editar_medicacao' m.id %}" 
+                       class="text-blue-700 hover:underline">Editar</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="p-4 text-center text-gray-500">
+                    Nenhuma medicação cadastrada.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}
