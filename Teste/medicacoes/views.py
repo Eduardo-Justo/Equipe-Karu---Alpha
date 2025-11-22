@@ -1,10 +1,111 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from .models import Medicacao, Lembrete, Estoque, RegistroAdministracao
 from .forms import MedicacaoForm, LembreteForm, EstoqueForm, RegistroForm
 
-# === PAINEL PRINCIPAL ===
+# === DADOS MOCKUP (Fakes) ===
+USUARIOS_FAKE = {
+    "joao": {
+        "senha": "123",
+        "nome_exibicao": "João (Pai)",
+        "remedios": [
+            {"nome": "Dipirona", "dosagem": "15 gotas", "horario": "08:00"},
+            {"nome": "Vitamina C", "dosagem": "1 comprimido", "horario": "10:00"}
+        ]
+    },
+    "maria": {
+        "senha": "abc",
+        "nome_exibicao": "Maria (Mãe)",
+        "remedios": [
+            {"nome": "Insulina", "dosagem": "2 unidades", "horario": "12:00"},
+            {"nome": "Omeprazol", "dosagem": "1 cápsula", "horario": "07:00"}
+        ]
+    }
+}
+
+# === LOGIN HÍBRIDO (CORRIGIDO) ===
+def login_view(request):
+    if request.method == 'POST':
+        usuario_form = request.POST.get('username')
+        senha_form = request.POST.get('password')
+
+        # 1. Tenta primeiro como Usuário Fake (Prioridade para a Demo)
+        if usuario_form in USUARIOS_FAKE and senha_form == USUARIOS_FAKE[usuario_form]['senha']:
+            request.session['usuario_fake'] = usuario_form
+            return redirect('area_pais')
+        
+        # 2. Se não for fake (ou senha errada), tenta autenticação Real do Django (Admin)
+        user = authenticate(request, username=usuario_form, password=senha_form)
+        
+        if user is not None:
+            login(request, user)
+            return redirect('dashboard') # Vai para o sistema real (Admin)
+        else:
+            messages.error(request, 'Usuário ou senha incorretos.')
+
+    return render(request, 'registration/login.html')
+
+def logout_view(request):
+    # 1. Pega o sistema de mensagens
+    storage = messages.get_messages(request)
+    
+    # 2. "Lê" todas as mensagens pendentes para forçar a limpeza delas
+    for _ in storage:
+        pass 
+    
+    logout(request) # Logout do Django
+    request.session.flush() # Limpa sessão fake
+    return redirect('login')
+
+# === ÁREA DOS PAIS (MOCKUP) ===
+def area_pais(request):
+    usuario_key = request.session.get('usuario_fake')
+    
+    if not usuario_key or usuario_key not in USUARIOS_FAKE:
+        return redirect('login')
+
+    dados_usuario = USUARIOS_FAKE[usuario_key]
+    
+    return render(request, 'medicacoes/dashboard_pais.html', {
+        'usuario': dados_usuario,
+        'remedios': dados_usuario['remedios']
+    })
+
+def simular_registro_pai(request):
+    usuario_key = request.session.get('usuario_fake')
+    remedio_nome = request.GET.get('remedio')
+    acao = request.GET.get('acao')
+
+    if usuario_key and remedio_nome:
+        med_real = Medicacao.objects.first() 
+        
+        if med_real:
+            # Lógica visual melhorada para o feedback
+            if acao == 'editou':
+                status_code = 'SISTEMA_EDIT'
+                # Mensagem técnica para o Histórico do Admin
+                msg_admin = f"PAI/MÃE ({USUARIOS_FAKE[usuario_key]['nome_exibicao']}) alterou configurações de: {remedio_nome}"
+                # Mensagem amigável para o Pai
+                msg_pai = f"Você editou as informações de {remedio_nome} com sucesso!"
+            else:
+                status_code = 'TOMEI'
+                msg_admin = f"PAI/MÃE ({USUARIOS_FAKE[usuario_key]['nome_exibicao']}) registrou dose tomada: {remedio_nome}"
+                msg_pai = f"Dose de {remedio_nome} confirmada!"
+
+            RegistroAdministracao.objects.create(
+                medicacao=med_real,
+                status=status_code,
+                observacoes=msg_admin
+            )
+            messages.success(request, msg_pai)
+    
+    return redirect('area_pais')
+
+
+# === SISTEMA REAL (ADMIN) ===
+
 @login_required
 def dashboard(request):
     context = {
@@ -14,7 +115,6 @@ def dashboard(request):
     }
     return render(request, "dashboard.html", context)
 
-# === MEDICAÇÕES ===
 @login_required
 def listar_medicacoes(request):
     medicacoes = Medicacao.objects.all().order_by('-data_inicio')
@@ -25,16 +125,12 @@ def criar_medicacao(request):
     if request.method == 'POST':
         form = MedicacaoForm(request.POST)
         if form.is_valid():
-            medicacao = form.save() # Salva a medicação
-            
-            # --- LOG AUTOMÁTICO ---
+            medicacao = form.save()
             RegistroAdministracao.objects.create(
                 medicacao=medicacao,
                 status='SISTEMA_ADD',
                 observacoes=f"Nova medicação cadastrada por {request.user.username}"
             )
-            # ----------------------
-
             messages.success(request, 'Medicação criada com sucesso!')
             return redirect('listar_medicacoes')
     else:
@@ -48,22 +144,17 @@ def editar_medicacao(request, id):
         form = MedicacaoForm(request.POST, instance=medicacao)
         if form.is_valid():
             form.save()
-
-            # --- LOG AUTOMÁTICO ---
             RegistroAdministracao.objects.create(
                 medicacao=medicacao,
                 status='SISTEMA_EDIT',
                 observacoes=f"Dados alterados por {request.user.username}"
             )
-            # ----------------------
-
             messages.success(request, 'Medicação atualizada!')
             return redirect('listar_medicacoes')
     else:
         form = MedicacaoForm(instance=medicacao)
     return render(request, "medicacoes/form.html", {'form': form, 'titulo': f'Editar {medicacao.nome}'})
 
-# === LEMBRETES ===
 @login_required
 def listar_lembretes(request):
     lembretes = Lembrete.objects.all().order_by('horario')
@@ -75,15 +166,11 @@ def criar_lembrete(request):
         form = LembreteForm(request.POST)
         if form.is_valid():
             lembrete = form.save()
-
-            # --- LOG AUTOMÁTICO ---
             RegistroAdministracao.objects.create(
                 medicacao=lembrete.medicacao,
                 status='SISTEMA_ADD',
                 observacoes=f"Novo lembrete definido para {lembrete.horario}"
             )
-            # ----------------------
-
             messages.success(request, 'Lembrete criado!')
             return redirect('listar_lembretes')
     else:
@@ -97,22 +184,17 @@ def editar_lembrete(request, id):
         form = LembreteForm(request.POST, instance=lembrete)
         if form.is_valid():
             form.save()
-
-            # --- LOG AUTOMÁTICO ---
             RegistroAdministracao.objects.create(
                 medicacao=lembrete.medicacao,
                 status='SISTEMA_EDIT',
                 observacoes=f"Horário do lembrete alterado para {lembrete.horario}"
             )
-            # ----------------------
-
             messages.success(request, 'Lembrete atualizado!')
             return redirect('listar_lembretes')
     else:
         form = LembreteForm(instance=lembrete)
     return render(request, "medicacoes/form.html", {'form': form, 'titulo': 'Editar Lembrete'})
 
-# === ESTOQUE ===
 @login_required
 def listar_estoque(request):
     estoques = Estoque.objects.all()
@@ -128,15 +210,11 @@ def criar_estoque(request):
             estoque = form.save(commit=False)
             estoque.atualizar_alerta()
             estoque.save()
-
-            # --- LOG AUTOMÁTICO ---
             RegistroAdministracao.objects.create(
                 medicacao=estoque.medicacao,
                 status='ESTOQUE_UP',
                 observacoes=f"Estoque iniciado: {estoque.quantidade_total_ml}ml"
             )
-            # ----------------------
-
             messages.success(request, 'Item adicionado ao estoque!')
             return redirect('listar_estoque')
     else:
@@ -152,22 +230,17 @@ def editar_estoque(request, id):
             estoque = form.save(commit=False)
             estoque.atualizar_alerta()
             estoque.save()
-
-            # --- LOG AUTOMÁTICO ---
             RegistroAdministracao.objects.create(
                 medicacao=estoque.medicacao,
                 status='ESTOQUE_UP',
                 observacoes=f"Estoque atualizado para: {estoque.quantidade_total_ml}ml"
             )
-            # ----------------------
-
             messages.success(request, 'Estoque atualizado!')
             return redirect('listar_estoque')
     else:
         form = EstoqueForm(instance=item)
     return render(request, "medicacoes/form.html", {'form': form, 'titulo': f'Editar Estoque: {item.medicacao.nome}'})
 
-# === REGISTROS ===
 @login_required
 def listar_registros(request):
     registros = RegistroAdministracao.objects.all().order_by('-horario_registro')

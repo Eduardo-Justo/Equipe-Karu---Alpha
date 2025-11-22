@@ -14,7 +14,7 @@
         <p class="text-slate-500 text-sm">Visualize todas as doses administradas no sistema.</p>
     </div>
 
-    <!-- Área de Filtros (Visual - Preparado para Backend Futuro) -->
+    <!-- Área de Filtros (Visual) -->
     <div class="flex gap-2 w-full md:w-auto">
         <div class="relative flex-1 md:w-64">
             <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
@@ -29,13 +29,12 @@
 <!-- Container da Tabela -->
 <div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
     
-    <!-- Wrapper para rolagem horizontal em mobile -->
     <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
             <thead>
                 <tr class="bg-slate-50 border-b border-slate-200 text-xs uppercase font-semibold text-slate-500 tracking-wider">
                     <th class="p-4 min-w-[200px]">
-                        <i class="fa-solid fa-pills mr-1"></i> Medicação
+                        <i class="fa-solid fa-pills mr-1"></i> Medicação / Origem
                     </th>
                     <th class="p-4">
                         <i class="fa-solid fa-info-circle mr-1"></i> Status
@@ -52,20 +51,24 @@
             <tbody class="divide-y divide-slate-100">
                 {% for r in registros %}
                 <tr class="hover:bg-slate-50 transition-colors group">
-                    <!-- Nome da Medicação -->
+                    
+                    <!-- Nome da Medicação (COM A CORREÇÃO VISUAL) -->
                     <td class="p-4">
-                        <div class="font-medium text-slate-800">{{ r.medicacao.nome }}</div>
-                        <!-- Opcional: Se tiver dosagem no modelo, poderia por aqui -->
-                        <!-- <div class="text-xs text-slate-400">500mg</div> -->
+                        <!-- Lógica: Se for registro de pai (fake), mostra "Via App" em vez do nome do banco -->
+                        {% if "PAI/MÃE" in r.observacoes %}
+                            <div class="flex items-center gap-2">
+                                <div class="w-8 h-8 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-xs">
+                                    <i class="fa-solid fa-mobile-screen"></i>
+                                </div>
+                                <span class="font-medium text-slate-600">Registro via App</span>
+                            </div>
+                        {% else %}
+                            <div class="font-medium text-slate-800">{{ r.medicacao.nome }}</div>
+                        {% endif %}
                     </td>
 
                     <!-- Status com Badge -->
                     <td class="p-4">
-                        <!-- 
-                           Dica: Aqui estou usando uma cor padrão (Azul/Slate). 
-                           Se quiser cores dinâmicas (ex: Verde para 'Tomou', Vermelho para 'Perdeu'),
-                           precisaremos de um IF simples aqui depois. Por enquanto, deixei um estilo 'neutro elegante'.
-                        -->
                         <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-brand-50 text-brand-700 border border-brand-100">
                             <span class="w-1.5 h-1.5 rounded-full bg-brand-600"></span>
                             {{ r.get_status_display }}
@@ -94,7 +97,7 @@
                     </td>
                 </tr>
                 {% empty %}
-                <!-- Estado Vazio (Empty State) Bonito -->
+                <!-- Estado Vazio -->
                 <tr>
                     <td colspan="4" class="p-12 text-center">
                         <div class="flex flex-col items-center justify-center">
@@ -113,10 +116,8 @@
         </table>
     </div>
     
-    <!-- Rodapé da Tabela (Paginação ou Contador) -->
     <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 text-xs text-slate-500 flex justify-between items-center">
         <span>Mostrando registros recentes</span>
-        <!-- Exemplo de contador se quiser implementar depois -->
         <span>Total: <strong>{{ registros|length }}</strong></span>
     </div>
 </div>

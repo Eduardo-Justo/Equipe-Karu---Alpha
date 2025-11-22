@@ -105,7 +105,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Maceio'  
 
 USE_I18N = True
 
@@ -122,6 +122,7 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# Lista de origens confiáveis para CSRF (Localhost e Portas comuns)
 CSRF_TRUSTED_ORIGINS = [
     'https://localhost:8000',
     'http://localhost:8000',
@@ -129,10 +130,23 @@ CSRF_TRUSTED_ORIGINS = [
     'http://localhost:8001',
     'http://127.0.0.1:8000',
     'http://127.0.0.1:8001',
-    'https://opulent-space-halibut-wrggw5xwwppv25pxg-8001.app.github.dev',
+    'https://opulent-space-halibut-wrggw5xwwppv25pxg-8001.app.github.dev'
 ]
+
+# Se estiver usando Codespaces (GitHub), adiciona o domínio dinâmico automaticamente
+import os
+if 'CODESPACE_NAME' in os.environ:
+    codespace_name = os.environ['CODESPACE_NAME']
+    codespace_domain = f"https://{codespace_name}-8000.app.github.dev"
+    CSRF_TRUSTED_ORIGINS.append(codespace_domain)
+    
+    # Adiciona também a porta 8001 por garantia, caso use ela
+    codespace_domain_8001 = f"https://{codespace_name}-8001.app.github.dev"
+    CSRF_TRUSTED_ORIGINS.append(codespace_domain_8001)
 
 # Configurações de Login
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/login/'
+
+MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'

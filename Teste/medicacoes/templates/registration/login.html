@@ -25,12 +25,14 @@
         <form method="post" class="space-y-6">
             {% csrf_token %}
             
-            <!-- Erros de Login -->
-            {% if form.errors %}
-                <div class="bg-red-50 text-red-600 p-3 rounded-lg text-sm border border-red-100 flex items-center gap-2">
-                    <i class="fa-solid fa-circle-exclamation"></i>
-                    <span>Usuário ou senha incorretos.</span>
-                </div>
+            <!-- CORREÇÃO AQUI: Exibir mensagens do Django (Erro) -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="bg-red-50 text-red-600 p-3 rounded-lg text-sm border border-red-100 flex items-center gap-2 animate-pulse">
+                        <i class="fa-solid fa-circle-exclamation"></i>
+                        <span>{{ message }}</span>
+                    </div>
+                {% endfor %}
             {% endif %}
 
             <div>

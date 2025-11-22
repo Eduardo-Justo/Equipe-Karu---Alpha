@@ -34,18 +34,24 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path
-from django.contrib.auth import views as auth_views
-from medicacoes import views  # Importa as views do seu app
+from medicacoes import views # Importa suas views
 
 urlpatterns = [
-    # === ADMINISTRAÇÃO ===
+    # === ADMINISTRAÇÃO DO DJANGO ===
     path('admin/', admin.site.urls),
 
-    # === AUTENTICAÇÃO (ESSENCIAL) ===
-    path('login/', auth_views.LoginView.as_view(), name='login'),
-    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
+    # === SISTEMA HÍBRIDO (LOGIN CUSTOMIZADO) ===
+    # Aqui mudamos: em vez de 'auth_views.LoginView', usamos 'views.login_view'
+    # Isso permite verificar se é um usuário Mockup (Pai/Mãe) ou Real (Admin)
+    path('login/', views.login_view, name='login'),
+    path('logout/', views.logout_view, name='logout'),
 
-    # === DASHBOARD ===
+    # === ÁREA DOS PAIS (MOCKUP) ===
+    # Novas rotas para a tela simplificada dos cuidadores
+    path('area-pais/', views.area_pais, name='area_pais'),
+    path('simular-acao/', views.simular_registro_pai, name='simular_registro_pai'),
+
+    # === SISTEMA REAL (ADMIN/DASHBOARD) ===
     path('', views.dashboard, name='dashboard'),
 
     # === MEDICAÇÕES ===
