@@ -1,0 +1,41 @@
+# === Python ===
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+
+# === Virtual environment ===
+env/
+venv/
+ENV/
+.venv/
+
+# === Django ===
+*.log
+*.pot
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+db.sqlite3
+
+# Media and static (generated files)
+media/
+staticfiles/
+
+# Local settings
+local_settings.py
+
+# Django cache
+*.cache
+
+# === VSCode ===
+.vscode/
+
+# === PyCharm ===
+.idea/
+
+# === OS files ===
+.DS_Store
+Thumbs.db
