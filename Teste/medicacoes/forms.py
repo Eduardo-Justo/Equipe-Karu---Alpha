@@ -1,8 +1,6 @@
 from django import forms
 from .models import Medicacao, Lembrete, Estoque, RegistroAdministracao
 
-# NOTE QUE AQUI NÃO TEM "from .forms import ..."
-
 class MedicacaoForm(forms.ModelForm):
     class Meta:
         model = Medicacao
@@ -15,7 +13,8 @@ class MedicacaoForm(forms.ModelForm):
 class LembreteForm(forms.ModelForm):
     class Meta:
         model = Lembrete
-        fields = ['medicacao', 'horario', 'canal_preferido', 'tolerancia_minutos']
+        # ADICIONADO: 'destinatario' na lista de campos
+        fields = ['medicacao', 'destinatario', 'horario', 'canal_preferido', 'tolerancia_minutos']
         widgets = {
             'horario': forms.TimeInput(attrs={'type': 'time'}),
         }

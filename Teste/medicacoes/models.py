@@ -20,13 +20,27 @@ class Medicacao(models.Model):
         return f"{self.nome} ({self.bebe_id})"
 
 class Lembrete(models.Model):
+    # --- NOVO: OPÇÕES DE USUÁRIOS ---
+    USUARIOS_ALVO = [
+        ('joao', 'João (Pai)'),
+        ('maria', 'Maria (Mãe)'),
+    ]
+
     medicacao = models.ForeignKey(Medicacao, on_delete=models.CASCADE, related_name="lembretes")
     horario = models.TimeField()
     canal_preferido = models.CharField(max_length=20, default="APP")
     tolerancia_minutos = models.IntegerField(default=30)
+    
+    # --- NOVO CAMPO: DESTINATÁRIO ---
+    destinatario = models.CharField(
+        max_length=20, 
+        choices=USUARIOS_ALVO, 
+        default='joao',
+        verbose_name="Responsável"
+    )
 
     def __str__(self):
-        return f"Lembrete de {self.medicacao.nome} às {self.horario}"
+        return f"Lembrete para {self.get_destinatario_display()} - {self.medicacao.nome}"
 
 class Estoque(models.Model):
     medicacao = models.OneToOneField(Medicacao, on_delete=models.CASCADE, related_name="estoque")
@@ -47,13 +61,10 @@ class Estoque(models.Model):
 
 class RegistroAdministracao(models.Model):
     OPCOES = [
-        # Ações do Usuário (Dia a dia)
         ("TOMEI", "Tomei/Dei a medicação"),
         ("ESQUECI", "Esqueci"),
         ("RECUSEI", "Bebê recusou"),
         ("VOMITOU", "Vomitou após tomar"),
-        
-        # NOVOS: Ações do Sistema (Auditoria)
         ("SISTEMA_ADD", "✨ Cadastro Novo"),
         ("SISTEMA_EDIT", "✏️ Edição de Dados"),
         ("ESTOQUE_UP", "📦 Atualização de Estoque"),
@@ -65,5 +76,5 @@ class RegistroAdministracao(models.Model):
     observacoes = models.TextField(blank=True)
 
     def __str__(self):
-        return f"{self.medicacao.nome} - {self.status} ({self.horario_registro.date()})"
+        return f"{self.medicacao.nome} - {self.status}"
         
