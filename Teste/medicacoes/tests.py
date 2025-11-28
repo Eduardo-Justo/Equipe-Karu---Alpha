@@ -174,7 +174,6 @@ class SistemaKaruTests(TestCase):
 
     def test_logica_alerta_estoque(self):
         """
-        Verifica a regra de negócio de Estoque Baixo (Item 3.4 do PDF).
 
         Description:
             O sistema deve calcular automaticamente a duração do estoque.
