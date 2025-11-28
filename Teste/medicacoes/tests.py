@@ -219,7 +219,7 @@ class SistemaKaruTests(TestCase):
         self.assertEqual(lembrete.get_destinatario_display(), "Maria (Mãe)")
 
     # ==================================================================
-    # 5. TESTES DE ANÁLISE E INTELIGÊNCIA (Item 4.2 do PDF)
+    # 5. TESTES DE ANÁLISE E INTELIGÊNCIA
     # ==================================================================
 
     def test_deteccao_alerta_vermelho(self):
