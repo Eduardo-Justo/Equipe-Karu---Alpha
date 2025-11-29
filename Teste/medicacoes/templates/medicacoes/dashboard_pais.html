@@ -63,95 +63,115 @@
         </div>
     </header>
 
-    <main class="flex-1 max-w-md w-full mx-auto p-4 mt-4">
+    <main class="flex-1 max-w-lg w-full mx-auto p-4 mt-4">
         
-        <!-- Mensagem de Boas-vindas Mobile (Só aparece em telas pequenas) -->
-        <div class="sm:hidden mb-6 flex items-center gap-3">
-            <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-bold border border-blue-200">
-                {{ usuario.nome_exibicao|slice:":1" }}
-            </div>
-            <div>
-                <h2 class="font-bold text-slate-800">Olá, {{ usuario.nome_exibicao }}</h2>
-                <p class="text-xs text-slate-500">Gerencie as doses de hoje.</p>
-            </div>
+    <div class="sm:hidden mb-6 flex items-center gap-3">
+        <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-bold border border-blue-200">
+            {{ usuario.nome_exibicao|slice:":1" }}
+        </div>
+        <div>
+            <h2 class="font-bold text-slate-800">Olá, {{ usuario.nome_exibicao }}</h2>
+            <p class="text-xs text-slate-500">Gerencie as doses de hoje.</p>
+        </div>
+    </div>
+
+    {% if messages %}
+        <div class="mb-6 space-y-2">
+            {% for message in messages %}
+                <div class="p-3 rounded-lg border flex items-start gap-3 shadow-sm animate-fade-in-down 
+                    {% if 'editou' in message.message %}bg-orange-50 border-orange-200 text-orange-800{% else %}bg-green-50 border-green-200 text-green-800{% endif %}">
+                    
+                    {% if 'editou' in message.message %}
+                        <i class="fa-solid fa-pen-to-square mt-0.5"></i>
+                    {% else %}
+                        <i class="fa-solid fa-circle-check mt-0.5"></i>
+                    {% endif %}
+                    
+                    <span class="text-sm font-medium">{{ message }}</span>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+        
+        <div class="px-5 py-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
+            <h2 class="font-bold text-slate-800 flex items-center gap-2">
+                <i class="fa-solid fa-bell text-orange-500"></i>
+                Lembretes Configurados
+            </h2>
+            <span class="bg-orange-100 text-orange-700 text-xs font-bold px-2 py-0.5 rounded-full">
+                {{ lembretes|length }}
+            </span>
         </div>
 
-        <!-- Mensagens de Feedback -->
-        {% if messages %}
-            <div class="mb-6 space-y-2">
-                {% for message in messages %}
-                    <div class="p-3 rounded-lg border flex items-start gap-3 shadow-sm animate-fade-in-down 
-                        {% if 'editou' in message.message %}bg-orange-50 border-orange-200 text-orange-800{% else %}bg-green-50 border-green-200 text-green-800{% endif %}">
-                        
-                        {% if 'editou' in message.message %}
-                            <i class="fa-solid fa-pen-to-square mt-0.5"></i>
-                        {% else %}
-                            <i class="fa-solid fa-circle-check mt-0.5"></i>
-                        {% endif %}
-                        
-                        <span class="text-sm font-medium">{{ message }}</span>
-                    </div>
-                {% endfor %}
-            </div>
-        {% endif %}
-
-        <div class="space-y-4">
-            {% for remedio in remedios %}
-            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md transition-all duration-200 relative overflow-hidden group">
+        <div class="divide-y divide-slate-100">
+            {% for l in lembretes %}
+            <div class="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-slate-50 transition-colors group">
                 
-                <!-- Detalhe decorativo lateral -->
-                <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-blue-500 rounded-l-2xl"></div>
-
-                <div class="flex justify-between items-start mb-5 pl-3">
+                <div class="flex items-start gap-3">
+                    <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 flex-shrink-0 mt-1">
+                        <i class="fa-solid fa-pills"></i>
+                    </div>
                     <div>
-                        <h3 class="font-bold text-lg text-slate-800 leading-none mb-2">{{ remedio.nome }}</h3>
-                        <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-slate-100 text-slate-600 border border-slate-200">
-                            {{ remedio.dosagem }}
-                        </span>
+                        <h3 class="font-bold text-slate-800 text-base leading-tight">{{ l.medicacao.nome }}</h3>
+                        <p class="text-xs text-slate-500 mt-1 flex items-center gap-1">
+                            <i class="fa-solid fa-prescription-bottle"></i> {{ l.medicacao.dosagem }}
+                        </p>
                     </div>
+                </div>
+
+                <div class="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto mt-2 sm:mt-0">
                     
-                    <!-- 3. HORÁRIO COM FONTE NOVA (Roboto Mono) -->
-                    <div class="text-center">
-                        <span class="block text-[10px] uppercase tracking-wide text-slate-400 font-semibold mb-1">Horário</span>
-                        <span class="font-mono text-2xl font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-lg border border-blue-100 tracking-tight">
-                            {{ remedio.horario }}
+                    <div class="flex items-center gap-2">
+                        <a href="{% url 'simular_registro_pai' %}?remedio={{ l.medicacao.nome }}&acao=editou" 
+                           class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-colors border border-transparent hover:border-blue-100" 
+                           title="Editar">
+                            <i class="fa-solid fa-pen text-sm"></i>
+                        </a>
+
+                        <a href="{% url 'simular_registro_pai' %}?remedio={{ l.medicacao.nome }}&acao=tomou" 
+                           class="flex items-center gap-1.5 bg-green-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-green-700 shadow-sm shadow-green-200 transition-all active:scale-95">
+                            <i class="fa-solid fa-check"></i>
+                            <span>Tomei</span>
+                        </a>
+                    </div>
+
+                    <div class="text-right pl-3 border-l border-slate-100">
+                        <span class="block font-mono text-lg font-bold text-orange-600 leading-none">
+                            {{ l.horario|time:"H:i" }}
+                        </span>
+                        <span class="text-[10px] text-slate-400 uppercase font-medium">
+                            {{ l.get_destinatario_display }}
                         </span>
                     </div>
-                </div>
 
-                <!-- Botões de Ação -->
-                <div class="grid grid-cols-2 gap-3 pl-3">
-                    <a href="{% url 'simular_registro_pai' %}?remedio={{ remedio.nome }}&acao=tomou" 
-                       class="flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm text-white bg-green-600 hover:bg-green-700 shadow-sm hover:shadow-green-200 hover:shadow transition-all active:scale-95">
-                        <i class="fa-solid fa-check"></i>
-                        Tomei
-                    </a>
-
-                    <a href="{% url 'simular_registro_pai' %}?remedio={{ remedio.nome }}&acao=editou" 
-                       class="flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-sm text-slate-600 bg-slate-50 border border-slate-200 hover:bg-white hover:text-blue-600 hover:border-blue-200 transition-all active:scale-95">
-                        <i class="fa-solid fa-pen"></i>
-                        Editar
-                    </a>
                 </div>
+            </div>
+            {% empty %}
+            <div class="p-8 text-center text-slate-400">
+                <i class="fa-regular fa-calendar-check text-3xl mb-2 opacity-50"></i>
+                <p class="text-sm">Nenhum lembrete para hoje.</p>
             </div>
             {% endfor %}
         </div>
+    </div>
 
-        <div class="mt-8 p-4 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-800 flex gap-3">
-            <i class="fa-solid fa-circle-info text-amber-500 text-lg"></i>
-            <div>
-                <p class="font-bold mb-1">Modo de Visualização Simplificado</p>
-                <p>Esta interface é otimizada para cuidadores. Todas as ações realizadas aqui (confirmação de dose ou edição) são registradas automaticamente no painel do Administrador.</p>
-            </div>
+    <div class="mt-8 p-4 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-800 flex gap-3">
+        <i class="fa-solid fa-circle-info text-amber-500 text-lg"></i>
+        <div>
+            <p class="font-bold mb-1">Modo de Visualização Simplificado</p>
+            <p>Esta interface é otimizada para cuidadores. Todas as ações realizadas aqui (confirmação de dose ou edição) são registradas automaticamente no painel do Administrador.</p>
         </div>
+    </div>
 
-        <div class="mt-8 text-center">
-            <p class="text-xs text-slate-400 flex items-center justify-center gap-1">
-                <i class="fa-solid fa-shield-halved"></i> Ambiente Seguro Karu
-            </p>
-        </div>
+    <div class="mt-8 text-center">
+        <p class="text-xs text-slate-400 flex items-center justify-center gap-1">
+            <i class="fa-solid fa-shield-halved"></i> Ambiente Seguro Karu
+        </p>
+    </div>
 
-    </main>
+</main>
 
 </body>
 </html>

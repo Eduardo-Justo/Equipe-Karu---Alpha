@@ -68,9 +68,13 @@ def area_pais(request):
 
     dados_usuario = USUARIOS_FAKE[usuario_key]
     
+    # NOVO: Buscar lembretes reais do banco de dados filtrados por destinatário
+    lembretes_reais = Lembrete.objects.filter(destinatario=usuario_key).order_by('horario')
+    
     return render(request, 'medicacoes/dashboard_pais.html', {
         'usuario': dados_usuario,
-        'remedios': dados_usuario['remedios']
+        'remedios': dados_usuario['remedios'],
+        'lembretes': lembretes_reais  # Novo: passar lembretes reais do banco
     })
 
 def simular_registro_pai(request):

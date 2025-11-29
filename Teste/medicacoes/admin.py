@@ -57,8 +57,8 @@ class MedicacaoAdmin(admin.ModelAdmin):
 # === LEMBRETE ===
 @admin.register(Lembrete)
 class LembreteAdmin(admin.ModelAdmin):
-    list_display = ('medicacao', 'horario', 'canal_preferido', 'tolerancia_minutos')
-    list_filter = ('canal_preferido', 'horario')
+    list_display = ('medicacao', 'destinatario', 'horario', 'canal_preferido', 'tolerancia_minutos')
+    list_filter = ('destinatario', 'canal_preferido', 'horario')
     search_fields = ('medicacao__nome',) # Busca pelo nome da medicação relacionada
 
 
